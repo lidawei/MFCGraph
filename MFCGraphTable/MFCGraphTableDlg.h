@@ -24,12 +24,19 @@ public:
 // 实现
 protected:
 	HICON m_hIcon;
+	enum { ChartValueCount = 10, ChartMaxValue = 120 };
+	int m_values[ChartValueCount];
+	int m_dragIndex;
+	bool m_isDragging;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnPaint();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 };

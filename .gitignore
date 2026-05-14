@@ -1,0 +1,55 @@
+# Visual Studio user state
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+
+# Visual Studio build outputs
+[Dd]ebug/
+[Rr]elease/
+[Xx]64/
+[Ww]in32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+ipch/
+
+# C/C++ intermediate files
+*.aps
+*.cache
+*.db
+*.opendb
+*.idb
+*.ilk
+*.iobj
+*.ipdb
+*.lastbuildstate
+*.log
+*.obj
+*.pch
+*.pdb
+*.recipe
+*.res
+*.tlog
+
+# Binaries and libraries
+*.app
+*.dll
+*.exe
+*.exp
+*.lib
+*.map
+
+# Test and coverage output
+TestResults/
+*.coverage
+*.coveragexml
+
+# Local/editor files
+*.tmp
+*.bak
+*.orig
+*.swp
+*.DS_Store
+Thumbs.db

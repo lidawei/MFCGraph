@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="LineChart.h" />
     <ClInclude Include="MFCGraphTable.h" />
     <ClInclude Include="MFCGraphTableDlg.h" />
     <ClInclude Include="pch.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LineChart.cpp" />
     <ClCompile Include="MFCGraphTable.cpp" />
     <ClCompile Include="MFCGraphTableDlg.cpp" />
     <ClCompile Include="pch.cpp">

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "LineChart.h"
+
 
 // CMFCGraphTableDlg 对话框
 class CMFCGraphTableDlg : public CDialogEx
@@ -24,10 +26,7 @@ public:
 // 实现
 protected:
 	HICON m_hIcon;
-	enum { ChartValueCount = 10, ChartMaxValue = 120 };
-	int m_values[ChartValueCount];
-	int m_dragIndex;
-	bool m_isDragging;
+	CLineChart m_lineChart;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();

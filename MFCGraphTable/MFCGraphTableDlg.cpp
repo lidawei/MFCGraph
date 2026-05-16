@@ -97,6 +97,7 @@ BEGIN_MESSAGE_MAP(CMFCGraphTableDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
+	ON_WM_DRAWITEM()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
@@ -136,8 +137,53 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+	m_pictureControl.ModifyStyle(SS_TYPEMASK, SS_OWNERDRAW | SS_NOTIFY);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+}
+
+BOOL CMFCGraphTableDlg::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->hwnd == m_pictureControl.GetSafeHwnd())
+	{
+		CPoint point(pMsg->pt);
+		m_pictureControl.ScreenToClient(&point);
+
+		CRect clientRect;
+		m_pictureControl.GetClientRect(&clientRect);
+
+		switch (pMsg->message)
+		{
+		case WM_LBUTTONDOWN:
+			if (m_lineChart.BeginDrag(clientRect, point))
+			{
+				m_pictureControl.SetCapture();
+				SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZENS));
+				return TRUE;
+			}
+			break;
+		case WM_LBUTTONUP:
+			if (m_lineChart.IsDragging())
+			{
+				m_lineChart.EndDrag();
+				ReleaseCapture();
+				return TRUE;
+			}
+			break;
+		case WM_MOUSEMOVE:
+			if (m_lineChart.IsDragging())
+			{
+				if (m_lineChart.DragTo(clientRect, point))
+				{
+					m_pictureControl.Invalidate(FALSE);
+				}
+				return TRUE;
+			}
+			break;
+		}
+	}
+
+	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
 void CMFCGraphTableDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -155,8 +201,7 @@ void CMFCGraphTableDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 BOOL CMFCGraphTableDlg::OnEraseBkgnd(CDC* pDC)
 {
-	UNREFERENCED_PARAMETER(pDC);
-	return TRUE;
+	return CDialogEx::OnEraseBkgnd(pDC);
 }
 
 // 如果向对话框添加最小化按钮，则需要下面的代码
@@ -184,26 +229,32 @@ void CMFCGraphTableDlg::OnPaint()
 	}
 	else
 	{
-		CPaintDC dc(this);
-		CRect rect;
-		GetClientRect(&rect);
-
-		CMemDCEx memDC(&dc, rect);
-		m_lineChart.Draw(&memDC, rect);
+		CDialogEx::OnPaint();
 	}
+}
+
+void CMFCGraphTableDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	if (nIDCtl == IDC_STATIC_PICTURE)
+	{
+		CDC dc;
+		dc.Attach(lpDrawItemStruct->hDC);
+
+		{
+			CRect rect(lpDrawItemStruct->rcItem);
+			CMemDCEx memDC(&dc, rect);
+			m_lineChart.Draw(&memDC, rect);
+		}
+
+		dc.Detach();
+		return;
+	}
+
+	CDialogEx::OnDrawItem(nIDCtl, lpDrawItemStruct);
 }
 
 void CMFCGraphTableDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	CRect clientRect;
-	GetClientRect(&clientRect);
-
-	if (m_lineChart.BeginDrag(clientRect, point))
-	{
-		SetCapture();
-		SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZENS));
-	}
-
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
@@ -224,13 +275,7 @@ void CMFCGraphTableDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (m_lineChart.IsDragging())
 	{
-		CRect clientRect;
-		GetClientRect(&clientRect);
-
-		if (m_lineChart.DragTo(clientRect, point))
-		{
-			Invalidate(FALSE);
-		}
+		m_pictureControl.Invalidate(FALSE);
 	}
 
 	CDialogEx::OnMouseMove(nFlags, point);
@@ -242,4 +287,3 @@ HCURSOR CMFCGraphTableDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
-

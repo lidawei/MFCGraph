@@ -90,6 +90,7 @@ CMFCGraphTableDlg::CMFCGraphTableDlg(CWnd* pParent /*=nullptr*/)
 void CMFCGraphTableDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_STATIC_PICTURE, m_pictureControl);
 }
 
 BEGIN_MESSAGE_MAP(CMFCGraphTableDlg, CDialogEx)

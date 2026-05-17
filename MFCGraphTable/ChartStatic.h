@@ -6,6 +6,9 @@ class CChartStatic : public CStatic
 {
 public:
 	CChartStatic();
+	void SetData(const std::vector<int>& values);
+	const std::vector<int>& GetData() const;
+	void ResetData();
 	void SetMoveAllPointsEnabled(bool enabled);
 	bool IsMoveAllPointsEnabled() const;
 

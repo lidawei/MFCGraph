@@ -3,6 +3,7 @@
 
 CLineChart::CLineChart()
 	: m_values{ 42, 58, 49, 72, 63, 88, 78, 94, 86, 108 }
+	, m_initialValues(m_values)
 	, m_dragIndex(-1)
 	, m_isDragging(false)
 	, m_moveAllPoints(false)
@@ -98,6 +99,11 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 
 bool CLineChart::BeginDrag(const CRect& clientRect, CPoint point)
 {
+	if (m_values.size() < 2)
+	{
+		return false;
+	}
+
 	CRect outerRect;
 	CRect chartRect;
 	if (!GetChartRects(clientRect, outerRect, chartRect))
@@ -118,7 +124,7 @@ bool CLineChart::BeginDrag(const CRect& clientRect, CPoint point)
 
 bool CLineChart::DragTo(const CRect& clientRect, CPoint point)
 {
-	if (!m_isDragging || m_dragIndex < 0)
+	if (!m_isDragging || m_dragIndex < 0 || m_dragIndex >= static_cast<int>(m_values.size()))
 	{
 		return false;
 	}
@@ -179,6 +185,39 @@ void CLineChart::EndDrag()
 bool CLineChart::IsDragging() const
 {
 	return m_isDragging;
+}
+
+void CLineChart::SetData(const std::vector<int>& values)
+{
+	m_values.clear();
+	m_values.reserve(values.size());
+	for (int value : values)
+	{
+		if (value < 0)
+		{
+			value = 0;
+		}
+		else if (value > MaxValue)
+		{
+			value = MaxValue;
+		}
+
+		m_values.push_back(value);
+	}
+
+	m_initialValues = m_values;
+	EndDrag();
+}
+
+const std::vector<int>& CLineChart::GetData() const
+{
+	return m_values;
+}
+
+void CLineChart::ResetData()
+{
+	m_values = m_initialValues;
+	EndDrag();
 }
 
 void CLineChart::SetMoveAllPointsEnabled(bool enabled)

@@ -44,6 +44,23 @@ CChartStatic::CChartStatic()
 {
 }
 
+void CChartStatic::SetData(const std::vector<int>& values)
+{
+	m_lineChart.SetData(values);
+	Invalidate(FALSE);
+}
+
+const std::vector<int>& CChartStatic::GetData() const
+{
+	return m_lineChart.GetData();
+}
+
+void CChartStatic::ResetData()
+{
+	m_lineChart.ResetData();
+	Invalidate(FALSE);
+}
+
 void CChartStatic::SetMoveAllPointsEnabled(bool enabled)
 {
 	m_lineChart.SetMoveAllPointsEnabled(enabled);

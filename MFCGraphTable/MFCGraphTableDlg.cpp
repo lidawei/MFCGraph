@@ -104,6 +104,7 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	m_pictureControl.SetMoveAllPointsEnabled(true);
+	m_pictureControl.SetData(std::vector<int>{42, 58, 49, 72, 63, 88, 78, 94, 86, 8, 10, 20});
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }

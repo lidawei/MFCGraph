@@ -11,6 +11,12 @@ public:
 	void ResetData();
 	void SetMoveAllPointsEnabled(bool enabled);
 	bool IsMoveAllPointsEnabled() const;
+	void SetYAxisMinValue(int value);
+	void SetYAxisMaxValue(int value);
+	void SetYAxisStep(int value);
+	int GetYAxisMinValue() const;
+	int GetYAxisMaxValue() const;
+	int GetYAxisStep() const;
 
 protected:
 	virtual void PreSubclassWindow();

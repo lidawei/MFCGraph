@@ -7,6 +7,9 @@ CLineChart::CLineChart()
 	, m_dragIndex(-1)
 	, m_isDragging(false)
 	, m_moveAllPoints(false)
+	, m_yMinValue(0)
+	, m_yMaxValue(120)
+	, m_yStep(20)
 {
 }
 
@@ -15,7 +18,7 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 	CRect rect(clientRect);
 	pDC->FillSolidRect(rect, ::GetSysColor(COLOR_3DFACE));
 
-	if (m_values.size() < 2 || MaxValue <= 0)
+	if (m_values.size() < 2 || m_yMaxValue <= m_yMinValue || m_yStep <= 0)
 	{
 		return;
 	}
@@ -25,8 +28,6 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 	{
 		return;
 	}
-
-	const int ySteps = 6;
 
 	CFont titleFont;
 	titleFont.CreatePointFont(110, _T("Microsoft YaHei"));
@@ -50,17 +51,33 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 	pDC->SelectObject(&labelFont);
 	pDC->SetTextColor(RGB(90, 90, 90));
 
-	for (int i = 0; i <= ySteps; ++i)
+	auto drawYGridLine = [&](int value)
 	{
-		const int y = chartRect.bottom - chartRect.Height() * i / ySteps;
+		const int y = chartRect.bottom
+			- chartRect.Height() * (value - m_yMinValue) / (m_yMaxValue - m_yMinValue);
 		pDC->SelectObject(&gridPen);
 		pDC->MoveTo(chartRect.left, y);
 		pDC->LineTo(chartRect.right, y);
 
 		CString label;
-		label.Format(_T("%d"), MaxValue * i / ySteps);
+		label.Format(_T("%d"), value);
 		pDC->DrawText(label, CRect(rect.left + 6, y - 8, chartRect.left - 8, y + 8),
 			DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+	};
+
+	int lastYGridValue = m_yMinValue;
+	for (int value = m_yMinValue; value <= m_yMaxValue; value += m_yStep)
+	{
+		drawYGridLine(value);
+		lastYGridValue = value;
+		if (value > m_yMaxValue - m_yStep)
+		{
+			break;
+		}
+	}
+	if (lastYGridValue != m_yMaxValue)
+	{
+		drawYGridLine(m_yMaxValue);
 	}
 
 	pDC->SelectObject(&gridPen);
@@ -162,13 +179,13 @@ bool CLineChart::DragTo(const CRect& clientRect, CPoint point)
 		}
 
 		int delta = newValue - m_values[m_dragIndex];
-		if (delta > MaxValue - maxValue)
+		if (delta > m_yMaxValue - maxValue)
 		{
-			delta = MaxValue - maxValue;
+			delta = m_yMaxValue - maxValue;
 		}
-		else if (delta < -minValue)
+		else if (delta < m_yMinValue - minValue)
 		{
-			delta = -minValue;
+			delta = m_yMinValue - minValue;
 		}
 
 		for (int& value : m_values)
@@ -197,23 +214,15 @@ bool CLineChart::IsDragging() const
 
 void CLineChart::SetData(const std::vector<int>& values)
 {
+	m_initialValues = values;
+
 	m_values.clear();
 	m_values.reserve(values.size());
 	for (int value : values)
 	{
-		if (value < 0)
-		{
-			value = 0;
-		}
-		else if (value > MaxValue)
-		{
-			value = MaxValue;
-		}
-
-		m_values.push_back(value);
+		m_values.push_back(ClampValue(value));
 	}
 
-	m_initialValues = m_values;
 	EndDrag();
 }
 
@@ -225,6 +234,7 @@ const std::vector<int>& CLineChart::GetData() const
 void CLineChart::ResetData()
 {
 	m_values = m_initialValues;
+	ClampDataToYAxis(m_values);
 	EndDrag();
 }
 
@@ -236,6 +246,53 @@ void CLineChart::SetMoveAllPointsEnabled(bool enabled)
 bool CLineChart::IsMoveAllPointsEnabled() const
 {
 	return m_moveAllPoints;
+}
+
+void CLineChart::SetYAxisMinValue(int value)
+{
+	m_yMinValue = value;
+	if (m_yMinValue >= m_yMaxValue)
+	{
+		m_yMaxValue = m_yMinValue + 1;
+	}
+
+	ClampDataToYAxis(m_values);
+	EndDrag();
+}
+
+void CLineChart::SetYAxisMaxValue(int value)
+{
+	m_yMaxValue = value;
+	if (m_yMaxValue <= m_yMinValue)
+	{
+		m_yMinValue = m_yMaxValue - 1;
+	}
+
+	ClampDataToYAxis(m_values);
+	EndDrag();
+}
+
+void CLineChart::SetYAxisStep(int value)
+{
+	if (value > 0)
+	{
+		m_yStep = value;
+	}
+}
+
+int CLineChart::GetYAxisMinValue() const
+{
+	return m_yMinValue;
+}
+
+int CLineChart::GetYAxisMaxValue() const
+{
+	return m_yMaxValue;
+}
+
+int CLineChart::GetYAxisStep() const
+{
+	return m_yStep;
 }
 
 bool CLineChart::GetChartRects(const CRect& clientRect, CRect& outerRect, CRect& chartRect) const
@@ -255,23 +312,38 @@ bool CLineChart::GetChartRects(const CRect& clientRect, CRect& outerRect, CRect&
 CPoint CLineChart::ValueToPoint(const CRect& chartRect, int index) const
 {
 	const int x = chartRect.left + chartRect.Width() * index / (static_cast<int>(m_values.size()) - 1);
-	const int y = chartRect.bottom - chartRect.Height() * m_values[index] / MaxValue;
+	const int y = chartRect.bottom
+		- chartRect.Height() * (m_values[index] - m_yMinValue) / (m_yMaxValue - m_yMinValue);
 	return CPoint(x, y);
 }
 
 int CLineChart::PointToValue(const CRect& chartRect, int y) const
 {
-	int value = (chartRect.bottom - y) * MaxValue / chartRect.Height();
-	if (value < 0)
+	const int value = m_yMinValue
+		+ (chartRect.bottom - y) * (m_yMaxValue - m_yMinValue) / chartRect.Height();
+	return ClampValue(value);
+}
+
+int CLineChart::ClampValue(int value) const
+{
+	if (value < m_yMinValue)
 	{
-		value = 0;
+		return m_yMinValue;
 	}
-	else if (value > MaxValue)
+	if (value > m_yMaxValue)
 	{
-		value = MaxValue;
+		return m_yMaxValue;
 	}
 
 	return value;
+}
+
+void CLineChart::ClampDataToYAxis(std::vector<int>& values) const
+{
+	for (int& value : values)
+	{
+		value = ClampValue(value);
+	}
 }
 
 int CLineChart::HitTestPoint(const CRect& chartRect, CPoint point) const

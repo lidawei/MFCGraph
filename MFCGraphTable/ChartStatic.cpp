@@ -71,6 +71,39 @@ bool CChartStatic::IsMoveAllPointsEnabled() const
 	return m_lineChart.IsMoveAllPointsEnabled();
 }
 
+void CChartStatic::SetYAxisMinValue(int value)
+{
+	m_lineChart.SetYAxisMinValue(value);
+	Invalidate(FALSE);
+}
+
+void CChartStatic::SetYAxisMaxValue(int value)
+{
+	m_lineChart.SetYAxisMaxValue(value);
+	Invalidate(FALSE);
+}
+
+void CChartStatic::SetYAxisStep(int value)
+{
+	m_lineChart.SetYAxisStep(value);
+	Invalidate(FALSE);
+}
+
+int CChartStatic::GetYAxisMinValue() const
+{
+	return m_lineChart.GetYAxisMinValue();
+}
+
+int CChartStatic::GetYAxisMaxValue() const
+{
+	return m_lineChart.GetYAxisMaxValue();
+}
+
+int CChartStatic::GetYAxisStep() const
+{
+	return m_lineChart.GetYAxisStep();
+}
+
 void CChartStatic::PreSubclassWindow()
 {
 	ModifyStyle(0, SS_NOTIFY);

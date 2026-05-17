@@ -12,6 +12,8 @@ public:
 	bool DragTo(const CRect& clientRect, CPoint point);
 	void EndDrag();
 	bool IsDragging() const;
+	void SetMoveAllPointsEnabled(bool enabled);
+	bool IsMoveAllPointsEnabled() const;
 
 private:
 	static const int MaxValue = 120;
@@ -27,4 +29,5 @@ private:
 	std::vector<int> m_values;
 	int m_dragIndex;
 	bool m_isDragging;
+	bool m_moveAllPoints;
 };

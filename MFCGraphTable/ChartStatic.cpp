@@ -44,6 +44,16 @@ CChartStatic::CChartStatic()
 {
 }
 
+void CChartStatic::SetMoveAllPointsEnabled(bool enabled)
+{
+	m_lineChart.SetMoveAllPointsEnabled(enabled);
+}
+
+bool CChartStatic::IsMoveAllPointsEnabled() const
+{
+	return m_lineChart.IsMoveAllPointsEnabled();
+}
+
 void CChartStatic::PreSubclassWindow()
 {
 	ModifyStyle(0, SS_NOTIFY);

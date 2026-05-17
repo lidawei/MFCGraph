@@ -6,6 +6,8 @@ class CChartStatic : public CStatic
 {
 public:
 	CChartStatic();
+	void SetMoveAllPointsEnabled(bool enabled);
+	bool IsMoveAllPointsEnabled() const;
 
 protected:
 	virtual void PreSubclassWindow();

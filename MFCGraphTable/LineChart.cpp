@@ -5,6 +5,7 @@ CLineChart::CLineChart()
 	: m_values{ 42, 58, 49, 72, 63, 88, 78, 94, 86, 108 }
 	, m_dragIndex(-1)
 	, m_isDragging(false)
+	, m_moveAllPoints(false)
 {
 }
 
@@ -129,7 +130,43 @@ bool CLineChart::DragTo(const CRect& clientRect, CPoint point)
 		return false;
 	}
 
-	m_values[m_dragIndex] = PointToValue(chartRect, point.y);
+	const int newValue = PointToValue(chartRect, point.y);
+	if (m_moveAllPoints)
+	{
+		int minValue = m_values[0];
+		int maxValue = m_values[0];
+		for (int value : m_values)
+		{
+			if (value < minValue)
+			{
+				minValue = value;
+			}
+			if (value > maxValue)
+			{
+				maxValue = value;
+			}
+		}
+
+		int delta = newValue - m_values[m_dragIndex];
+		if (delta > MaxValue - maxValue)
+		{
+			delta = MaxValue - maxValue;
+		}
+		else if (delta < -minValue)
+		{
+			delta = -minValue;
+		}
+
+		for (int& value : m_values)
+		{
+			value += delta;
+		}
+	}
+	else
+	{
+		m_values[m_dragIndex] = newValue;
+	}
+
 	return true;
 }
 
@@ -142,6 +179,16 @@ void CLineChart::EndDrag()
 bool CLineChart::IsDragging() const
 {
 	return m_isDragging;
+}
+
+void CLineChart::SetMoveAllPointsEnabled(bool enabled)
+{
+	m_moveAllPoints = enabled;
+}
+
+bool CLineChart::IsMoveAllPointsEnabled() const
+{
+	return m_moveAllPoints;
 }
 
 bool CLineChart::GetChartRects(const CRect& clientRect, CRect& outerRect, CRect& chartRect) const

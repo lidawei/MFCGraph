@@ -63,6 +63,14 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 			DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
 	}
 
+	pDC->SelectObject(&gridPen);
+	for (int i = 0; i < static_cast<int>(m_values.size()); ++i)
+	{
+		const int x = chartRect.left + chartRect.Width() * i / (static_cast<int>(m_values.size()) - 1);
+		pDC->MoveTo(x, chartRect.top);
+		pDC->LineTo(x, chartRect.bottom);
+	}
+
 	pDC->SelectObject(&axisPen);
 	pDC->MoveTo(chartRect.left, chartRect.top);
 	pDC->LineTo(chartRect.left, chartRect.bottom);

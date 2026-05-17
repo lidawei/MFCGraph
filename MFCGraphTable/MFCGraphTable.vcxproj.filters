@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChartStatic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="MFCGraphTable.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -38,6 +41,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChartStatic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="MFCGraphTable.cpp">
       <Filter>源文件</Filter>
     </ClCompile>

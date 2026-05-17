@@ -12,37 +12,6 @@
 #define new DEBUG_NEW
 #endif
 
-namespace
-{
-class CMemDCEx : public CDC
-{
-public:
-	CMemDCEx(CDC* pDC, const CRect& rect)
-		: m_pDC(pDC)
-		, m_rect(rect)
-		, m_pOldBitmap(nullptr)
-	{
-		CreateCompatibleDC(pDC);
-		m_bitmap.CreateCompatibleBitmap(pDC, rect.Width(), rect.Height());
-		m_pOldBitmap = SelectObject(&m_bitmap);
-		SetWindowOrg(rect.left, rect.top);
-	}
-
-	~CMemDCEx()
-	{
-		m_pDC->BitBlt(m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
-			this, m_rect.left, m_rect.top, SRCCOPY);
-		SelectObject(m_pOldBitmap);
-	}
-
-private:
-	CDC* m_pDC;
-	CRect m_rect;
-	CBitmap m_bitmap;
-	CBitmap* m_pOldBitmap;
-};
-}
-
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -91,16 +60,13 @@ void CMFCGraphTableDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_STATIC_PICTURE, m_pictureControl);
+	DDX_Control(pDX, IDC_STATIC_PICTURE2, m_pictureControl2);
 }
 
 BEGIN_MESSAGE_MAP(CMFCGraphTableDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
-	ON_WM_DRAWITEM()
-	ON_WM_LBUTTONDOWN()
-	ON_WM_LBUTTONUP()
-	ON_WM_MOUSEMOVE()
 	ON_WM_QUERYDRAGICON()
 END_MESSAGE_MAP()
 
@@ -137,53 +103,8 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	m_pictureControl.ModifyStyle(SS_TYPEMASK, SS_OWNERDRAW | SS_NOTIFY);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
-}
-
-BOOL CMFCGraphTableDlg::PreTranslateMessage(MSG* pMsg)
-{
-	if (pMsg->hwnd == m_pictureControl.GetSafeHwnd())
-	{
-		CPoint point(pMsg->pt);
-		m_pictureControl.ScreenToClient(&point);
-
-		CRect clientRect;
-		m_pictureControl.GetClientRect(&clientRect);
-
-		switch (pMsg->message)
-		{
-		case WM_LBUTTONDOWN:
-			if (m_lineChart.BeginDrag(clientRect, point))
-			{
-				m_pictureControl.SetCapture();
-				SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZENS));
-				return TRUE;
-			}
-			break;
-		case WM_LBUTTONUP:
-			if (m_lineChart.IsDragging())
-			{
-				m_lineChart.EndDrag();
-				ReleaseCapture();
-				return TRUE;
-			}
-			break;
-		case WM_MOUSEMOVE:
-			if (m_lineChart.IsDragging())
-			{
-				if (m_lineChart.DragTo(clientRect, point))
-				{
-					m_pictureControl.Invalidate(FALSE);
-				}
-				return TRUE;
-			}
-			break;
-		}
-	}
-
-	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
 void CMFCGraphTableDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -231,54 +152,6 @@ void CMFCGraphTableDlg::OnPaint()
 	{
 		CDialogEx::OnPaint();
 	}
-}
-
-void CMFCGraphTableDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
-{
-	if (nIDCtl == IDC_STATIC_PICTURE)
-	{
-		CDC dc;
-		dc.Attach(lpDrawItemStruct->hDC);
-
-		{
-			CRect rect(lpDrawItemStruct->rcItem);
-			CMemDCEx memDC(&dc, rect);
-			m_lineChart.Draw(&memDC, rect);
-		}
-
-		dc.Detach();
-		return;
-	}
-
-	CDialogEx::OnDrawItem(nIDCtl, lpDrawItemStruct);
-}
-
-void CMFCGraphTableDlg::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	CDialogEx::OnLButtonDown(nFlags, point);
-}
-
-void CMFCGraphTableDlg::OnLButtonUp(UINT nFlags, CPoint point)
-{
-	UNREFERENCED_PARAMETER(point);
-
-	if (m_lineChart.IsDragging())
-	{
-		m_lineChart.EndDrag();
-		ReleaseCapture();
-	}
-
-	CDialogEx::OnLButtonUp(nFlags, point);
-}
-
-void CMFCGraphTableDlg::OnMouseMove(UINT nFlags, CPoint point)
-{
-	if (m_lineChart.IsDragging())
-	{
-		m_pictureControl.Invalidate(FALSE);
-	}
-
-	CDialogEx::OnMouseMove(nFlags, point);
 }
 
 //当用户拖动最小化窗口时系统调用此函数取得光标

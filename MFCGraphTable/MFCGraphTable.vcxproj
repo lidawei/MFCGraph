@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ChartStatic.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="LineChart.h" />
     <ClInclude Include="MFCGraphTable.h" />
@@ -192,6 +193,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChartStatic.cpp" />
     <ClCompile Include="LineChart.cpp" />
     <ClCompile Include="MFCGraphTable.cpp" />
     <ClCompile Include="MFCGraphTableDlg.cpp" />

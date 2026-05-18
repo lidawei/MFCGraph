@@ -29,13 +29,16 @@ protected:
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
-	void CreateChartPanel(UINT placeholderID, CChartPanel& panel);
+	void CreateChartPanel(CChartPanel& panel, const CRect& rect);
+	void ShowChartPanel(int index);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg void OnTcnSelchangeTabCharts(NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
 public:
+	CTabCtrl m_chartTab;
 	CChartPanel m_chartPanel;
 	CChartPanel m_chartPanel2;
 };

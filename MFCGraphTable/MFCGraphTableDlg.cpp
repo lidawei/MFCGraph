@@ -59,6 +59,7 @@ CMFCGraphTableDlg::CMFCGraphTableDlg(CWnd* pParent /*=nullptr*/)
 void CMFCGraphTableDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_TAB_CHARTS, m_chartTab);
 }
 
 BEGIN_MESSAGE_MAP(CMFCGraphTableDlg, CDialogEx)
@@ -66,6 +67,7 @@ BEGIN_MESSAGE_MAP(CMFCGraphTableDlg, CDialogEx)
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_CHARTS, &CMFCGraphTableDlg::OnTcnSelchangeTabCharts)
 END_MESSAGE_MAP()
 
 
@@ -101,33 +103,41 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	CreateChartPanel(IDC_STATIC_PICTURE, m_chartPanel);
-	CreateChartPanel(IDC_STATIC_PICTURE2, m_chartPanel2);
+	m_chartTab.InsertItem(0, _T("折线图 1"));
+	m_chartTab.InsertItem(1, _T("折线图 2"));
+
+	CRect tabWindowRect;
+	m_chartTab.GetWindowRect(&tabWindowRect);
+	ScreenToClient(&tabWindowRect);
+
+	CRect pageRect;
+	m_chartTab.GetClientRect(&pageRect);
+	m_chartTab.AdjustRect(FALSE, &pageRect);
+	pageRect.OffsetRect(tabWindowRect.left, tabWindowRect.top);
+
+	CreateChartPanel(m_chartPanel, pageRect);
+	CreateChartPanel(m_chartPanel2, pageRect);
 
 	m_chartPanel.SetMoveAllPointsEnabled(true);
 	m_chartPanel.SetData(std::vector<int>{42, 58, 49, 72, 63, 88, 78, 94, 86, 8, 10, 20});
+	ShowChartPanel(0);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
-void CMFCGraphTableDlg::CreateChartPanel(UINT placeholderID, CChartPanel& panel)
+void CMFCGraphTableDlg::CreateChartPanel(CChartPanel& panel, const CRect& rect)
 {
-	CWnd* pPlaceholder = GetDlgItem(placeholderID);
-	if (pPlaceholder == nullptr)
-	{
-		return;
-	}
-
-	CRect rect;
-	pPlaceholder->GetWindowRect(&rect);
-	ScreenToClient(&rect);
-	pPlaceholder->ShowWindow(SW_HIDE);
-
 	if (panel.Create(IDD_CHART_PANEL, this))
 	{
 		panel.SetWindowPos(nullptr, rect.left, rect.top, rect.Width(), rect.Height(),
-			SWP_NOZORDER | SWP_SHOWWINDOW);
+			SWP_NOZORDER | SWP_NOACTIVATE);
 	}
+}
+
+void CMFCGraphTableDlg::ShowChartPanel(int index)
+{
+	m_chartPanel.ShowWindow(index == 0 ? SW_SHOW : SW_HIDE);
+	m_chartPanel2.ShowWindow(index == 1 ? SW_SHOW : SW_HIDE);
 }
 
 void CMFCGraphTableDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -182,4 +192,12 @@ void CMFCGraphTableDlg::OnPaint()
 HCURSOR CMFCGraphTableDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
+}
+
+void CMFCGraphTableDlg::OnTcnSelchangeTabCharts(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	UNREFERENCED_PARAMETER(pNMHDR);
+
+	ShowChartPanel(m_chartTab.GetCurSel());
+	*pResult = 0;
 }

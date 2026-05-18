@@ -10,6 +10,7 @@
 #define IDD_CHART_PANEL                 129
 #define IDC_STATIC_PICTURE              1000
 #define IDC_STATIC_PICTURE2             1001
+#define IDC_TAB_CHARTS                  1002
 #define IDC_CHECK_LOCK                  1004
 #define IDC_EDIT_MAXVAL                 1011
 #define IDC_EDIT_MINVAL                 1012

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ChartStatic.h"
+#include "CChartPanel.h"
 
 
 // CMFCGraphTableDlg 对话框
@@ -29,12 +29,13 @@ protected:
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
+	void CreateChartPanel(UINT placeholderID, CChartPanel& panel);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	CChartStatic m_pictureControl;
-	CChartStatic m_pictureControl2;
+	CChartPanel m_chartPanel;
+	CChartPanel m_chartPanel2;
 };

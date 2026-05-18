@@ -59,8 +59,6 @@ CMFCGraphTableDlg::CMFCGraphTableDlg(CWnd* pParent /*=nullptr*/)
 void CMFCGraphTableDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_STATIC_PICTURE, m_pictureControl);
-	DDX_Control(pDX, IDC_STATIC_PICTURE2, m_pictureControl2);
 }
 
 BEGIN_MESSAGE_MAP(CMFCGraphTableDlg, CDialogEx)
@@ -103,10 +101,33 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	m_pictureControl.SetMoveAllPointsEnabled(true);
-	m_pictureControl.SetData(std::vector<int>{42, 58, 49, 72, 63, 88, 78, 94, 86, 8, 10, 20});
+	CreateChartPanel(IDC_STATIC_PICTURE, m_chartPanel);
+	CreateChartPanel(IDC_STATIC_PICTURE2, m_chartPanel2);
+
+	m_chartPanel.SetMoveAllPointsEnabled(true);
+	m_chartPanel.SetData(std::vector<int>{42, 58, 49, 72, 63, 88, 78, 94, 86, 8, 10, 20});
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
+}
+
+void CMFCGraphTableDlg::CreateChartPanel(UINT placeholderID, CChartPanel& panel)
+{
+	CWnd* pPlaceholder = GetDlgItem(placeholderID);
+	if (pPlaceholder == nullptr)
+	{
+		return;
+	}
+
+	CRect rect;
+	pPlaceholder->GetWindowRect(&rect);
+	ScreenToClient(&rect);
+	pPlaceholder->ShowWindow(SW_HIDE);
+
+	if (panel.Create(IDD_CHART_PANEL, this))
+	{
+		panel.SetWindowPos(nullptr, rect.left, rect.top, rect.Width(), rect.Height(),
+			SWP_NOZORDER | SWP_SHOWWINDOW);
+	}
 }
 
 void CMFCGraphTableDlg::OnSysCommand(UINT nID, LPARAM lParam)

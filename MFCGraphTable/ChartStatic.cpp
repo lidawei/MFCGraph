@@ -169,6 +169,7 @@ void CChartStatic::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		SetCapture();
 		SetCursor(AfxGetApp()->LoadStandardCursor(IDC_SIZENS));
+		Invalidate(FALSE);
 	}
 
 	CStatic::OnLButtonDown(nFlags, point);
@@ -182,6 +183,7 @@ void CChartStatic::OnLButtonUp(UINT nFlags, CPoint point)
 	{
 		m_lineChart.EndDrag();
 		ReleaseCapture();
+		Invalidate(FALSE);
 	}
 
 	CStatic::OnLButtonUp(nFlags, point);

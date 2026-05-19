@@ -143,6 +143,59 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 		pDC->RestoreDC(savedDC);
 	}
 
+	if (m_isDragging && m_dragIndex >= 0 && m_dragIndex < static_cast<int>(points.size()))
+	{
+		const CPoint selectedPoint = points[m_dragIndex];
+		if (selectedPoint.x >= chartRect.left && selectedPoint.x <= chartRect.right
+			&& selectedPoint.y >= chartRect.top && selectedPoint.y <= chartRect.bottom)
+		{
+			const int selectedXValue = m_dragIndex + 1;
+			const int selectedYValue = m_values[m_dragIndex];
+
+			CPen guidePen(PS_DOT, 1, RGB(80, 80, 80));
+			CPen highlightPen(PS_SOLID, 2, RGB(255, 128, 0));
+			CPen* pOldGuidePen = pDC->SelectObject(&guidePen);
+
+			pDC->MoveTo(chartRect.left, selectedPoint.y);
+			pDC->LineTo(selectedPoint.x, selectedPoint.y);
+			pDC->MoveTo(selectedPoint.x, selectedPoint.y);
+			pDC->LineTo(selectedPoint.x, chartRect.bottom);
+
+			pDC->SelectObject(&highlightPen);
+			CBrush* pOldHighlightBrush = static_cast<CBrush*>(pDC->SelectStockObject(NULL_BRUSH));
+			CRect highlightRect(selectedPoint.x - 9, selectedPoint.y - 9,
+				selectedPoint.x + 9, selectedPoint.y + 9);
+			pDC->Ellipse(highlightRect);
+			pDC->SelectObject(pOldHighlightBrush);
+			pDC->SelectObject(pOldGuidePen);
+
+			CString valueText;
+			valueText.Format(_T("X=%d, Y=%d"), selectedXValue, selectedYValue);
+
+			CRect textRect(selectedPoint.x + 10, selectedPoint.y - 26,
+				selectedPoint.x + 110, selectedPoint.y - 6);
+			if (textRect.right > chartRect.right)
+			{
+				textRect.OffsetRect(chartRect.right - textRect.right, 0);
+			}
+			if (textRect.top < chartRect.top)
+			{
+				textRect.OffsetRect(0, chartRect.top - textRect.top);
+			}
+
+			pDC->FillSolidRect(textRect, RGB(255, 255, 230));
+			CPen textBorderPen(PS_SOLID, 1, RGB(210, 170, 80));
+			CPen* pOldTextPen = pDC->SelectObject(&textBorderPen);
+			CBrush* pOldTextBrush = static_cast<CBrush*>(pDC->SelectStockObject(NULL_BRUSH));
+			pDC->Rectangle(textRect);
+			pDC->SelectObject(pOldTextBrush);
+			pDC->SelectObject(pOldTextPen);
+
+			pDC->SetTextColor(RGB(45, 45, 45));
+			pDC->DrawText(valueText, textRect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		}
+	}
+
 	pDC->SelectObject(pOldBrush);
 	pDC->SelectObject(pOldPen);
 	pDC->SelectObject(pOldFont);

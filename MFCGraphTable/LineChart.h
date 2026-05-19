@@ -42,7 +42,7 @@ private:
 	void UpdateDefaultXAxisRange();
 	int HitTestPoint(const CRect& chartRect, CPoint point) const;
 	COLORREF LerpColor(COLORREF from, COLORREF to, double t) const;
-	void DrawThreeColorGradient(CDC* pDC, const CRect& rect) const;
+	void DrawFourColorGradient(CDC* pDC, const CRect& rect) const;
 
 	std::vector<int> m_values;
 	std::vector<int> m_initialValues;

@@ -47,7 +47,7 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 	pDC->RoundRect(rect, CPoint(8, 8));
 	pDC->DrawText(_T("\u6298\u7ebf\u56fe Demo"), CRect(rect.left, rect.top, rect.right, chartRect.top - 6),
 		DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-	DrawThreeColorGradient(pDC, chartRect);
+	DrawFourColorGradient(pDC, chartRect);
 
 	CPen gridPen(PS_SOLID, 1, RGB(230, 230, 230));
 	CPen axisPen(PS_SOLID, 1, RGB(120, 120, 120));
@@ -507,11 +507,12 @@ COLORREF CLineChart::LerpColor(COLORREF from, COLORREF to, double t) const
 	return RGB(red, green, blue);
 }
 
-void CLineChart::DrawThreeColorGradient(CDC* pDC, const CRect& rect) const
+void CLineChart::DrawFourColorGradient(CDC* pDC, const CRect& rect) const
 {
-	const COLORREF leftColor = RGB(90, 160, 230);
-	const COLORREF centerColor = RGB(255, 235, 120);
-	const COLORREF rightColor = RGB(95, 190, 120);
+	const COLORREF firstColor = RGB(255, 0, 0);
+	const COLORREF secondColor = RGB(0, 255, 0);
+	const COLORREF thirdColor = RGB(0, 0, 255);
+	const COLORREF fourthColor = RGB(255, 0, 0);
 	const int width = rect.Width();
 
 	if (width <= 0 || rect.Height() <= 0)
@@ -522,9 +523,19 @@ void CLineChart::DrawThreeColorGradient(CDC* pDC, const CRect& rect) const
 	for (int x = 0; x < width; ++x)
 	{
 		const double position = width == 1 ? 0.0 : static_cast<double>(x) / (width - 1);
-		const COLORREF color = position <= 0.5
-			? LerpColor(leftColor, centerColor, position * 2.0)
-			: LerpColor(centerColor, rightColor, (position - 0.5) * 2.0);
+		COLORREF color = firstColor;
+		if (position <= 1.0 / 3.0)
+		{
+			color = LerpColor(firstColor, secondColor, position * 3.0);
+		}
+		else if (position <= 2.0 / 3.0)
+		{
+			color = LerpColor(secondColor, thirdColor, (position - 1.0 / 3.0) * 3.0);
+		}
+		else
+		{
+			color = LerpColor(thirdColor, fourthColor, (position - 2.0 / 3.0) * 3.0);
+		}
 
 		pDC->FillSolidRect(rect.left + x, rect.top, 1, rect.Height(), color);
 	}

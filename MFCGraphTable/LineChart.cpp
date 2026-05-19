@@ -10,6 +10,10 @@ CLineChart::CLineChart()
 	, m_yMinValue(0)
 	, m_yMaxValue(120)
 	, m_yStep(20)
+	, m_xMinValue(1)
+	, m_xMaxValue(static_cast<int>(m_values.size()))
+	, m_xStep(1)
+	, m_isXAxisConfigured(false)
 {
 }
 
@@ -18,7 +22,8 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 	CRect rect(clientRect);
 	pDC->FillSolidRect(rect, ::GetSysColor(COLOR_3DFACE));
 
-	if (m_values.size() < 2 || m_yMaxValue <= m_yMinValue || m_yStep <= 0)
+	if (m_values.size() < 2 || m_yMaxValue <= m_yMinValue || m_yStep <= 0
+		|| m_xMaxValue <= m_xMinValue || m_xStep <= 0)
 	{
 		return;
 	}
@@ -80,12 +85,32 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 		drawYGridLine(m_yMaxValue);
 	}
 
-	pDC->SelectObject(&gridPen);
-	for (int i = 0; i < static_cast<int>(m_values.size()); ++i)
+	auto drawXGridLine = [&](int value)
 	{
-		const int x = chartRect.left + chartRect.Width() * i / (static_cast<int>(m_values.size()) - 1);
+		const int x = XValueToPixel(chartRect, value);
 		pDC->MoveTo(x, chartRect.top);
 		pDC->LineTo(x, chartRect.bottom);
+
+		CString label;
+		label.Format(_T("%d"), value);
+		pDC->DrawText(label, CRect(x - 18, chartRect.bottom + 8, x + 18, chartRect.bottom + 26),
+			DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+	};
+
+	pDC->SelectObject(&gridPen);
+	int lastXGridValue = m_xMinValue;
+	for (int value = m_xMinValue; value <= m_xMaxValue; value += m_xStep)
+	{
+		drawXGridLine(value);
+		lastXGridValue = value;
+		if (value > m_xMaxValue - m_xStep)
+		{
+			break;
+		}
+	}
+	if (lastXGridValue != m_xMaxValue)
+	{
+		drawXGridLine(m_xMaxValue);
 	}
 
 	pDC->SelectObject(&axisPen);
@@ -97,24 +122,25 @@ void CLineChart::Draw(CDC* pDC, const CRect& clientRect)
 	for (int i = 0; i < static_cast<int>(m_values.size()); ++i)
 	{
 		points[i] = ValueToPoint(chartRect, i);
-
-		CString label;
-		label.Format(_T("%d"), i + 1);
-		pDC->DrawText(label, CRect(points[i].x - 16, chartRect.bottom + 8,
-			points[i].x + 16, chartRect.bottom + 26),
-			DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 	}
 
-	CPen linePen(PS_SOLID, 2, RGB(46, 117, 182));
-	pDC->SelectObject(&linePen);
-	pDC->Polyline(points.data(), static_cast<int>(points.size()));
-
-	CBrush pointBrush(RGB(46, 117, 182));
-	pDC->SelectObject(&pointBrush);
-	for (int i = 0; i < static_cast<int>(points.size()); ++i)
 	{
-		CRect pointRect(points[i].x - 4, points[i].y - 4, points[i].x + 4, points[i].y + 4);
-		pDC->Ellipse(pointRect);
+		const int savedDC = pDC->SaveDC();
+		pDC->IntersectClipRect(chartRect);
+
+		CPen linePen(PS_SOLID, 2, RGB(46, 117, 182));
+		pDC->SelectObject(&linePen);
+		pDC->Polyline(points.data(), static_cast<int>(points.size()));
+
+		CBrush pointBrush(RGB(46, 117, 182));
+		pDC->SelectObject(&pointBrush);
+		for (int i = 0; i < static_cast<int>(points.size()); ++i)
+		{
+			CRect pointRect(points[i].x - 4, points[i].y - 4, points[i].x + 4, points[i].y + 4);
+			pDC->Ellipse(pointRect);
+		}
+
+		pDC->RestoreDC(savedDC);
 	}
 
 	pDC->SelectObject(pOldBrush);
@@ -222,6 +248,7 @@ void CLineChart::SetData(const std::vector<int>& values)
 	{
 		m_values.push_back(ClampValue(value));
 	}
+	UpdateDefaultXAxisRange();
 
 	EndDrag();
 }
@@ -295,6 +322,50 @@ int CLineChart::GetYAxisStep() const
 	return m_yStep;
 }
 
+void CLineChart::SetXAxisMinValue(int value)
+{
+	m_xMinValue = value;
+	m_isXAxisConfigured = true;
+	if (m_xMinValue >= m_xMaxValue)
+	{
+		m_xMaxValue = m_xMinValue + 1;
+	}
+}
+
+void CLineChart::SetXAxisMaxValue(int value)
+{
+	m_xMaxValue = value;
+	m_isXAxisConfigured = true;
+	if (m_xMaxValue <= m_xMinValue)
+	{
+		m_xMinValue = m_xMaxValue - 1;
+	}
+}
+
+void CLineChart::SetXAxisStep(int value)
+{
+	if (value > 0)
+	{
+		m_xStep = value;
+		m_isXAxisConfigured = true;
+	}
+}
+
+int CLineChart::GetXAxisMinValue() const
+{
+	return m_xMinValue;
+}
+
+int CLineChart::GetXAxisMaxValue() const
+{
+	return m_xMaxValue;
+}
+
+int CLineChart::GetXAxisStep() const
+{
+	return m_xStep;
+}
+
 bool CLineChart::GetChartRects(const CRect& clientRect, CRect& outerRect, CRect& chartRect) const
 {
 	outerRect = clientRect;
@@ -311,10 +382,16 @@ bool CLineChart::GetChartRects(const CRect& clientRect, CRect& outerRect, CRect&
 
 CPoint CLineChart::ValueToPoint(const CRect& chartRect, int index) const
 {
-	const int x = chartRect.left + chartRect.Width() * index / (static_cast<int>(m_values.size()) - 1);
+	const int x = XValueToPixel(chartRect, index + 1);
 	const int y = chartRect.bottom
 		- chartRect.Height() * (m_values[index] - m_yMinValue) / (m_yMaxValue - m_yMinValue);
 	return CPoint(x, y);
+}
+
+int CLineChart::XValueToPixel(const CRect& chartRect, int value) const
+{
+	return chartRect.left
+		+ chartRect.Width() * (value - m_xMinValue) / (m_xMaxValue - m_xMinValue);
 }
 
 int CLineChart::PointToValue(const CRect& chartRect, int y) const
@@ -343,6 +420,15 @@ void CLineChart::ClampDataToYAxis(std::vector<int>& values) const
 	for (int& value : values)
 	{
 		value = ClampValue(value);
+	}
+}
+
+void CLineChart::UpdateDefaultXAxisRange()
+{
+	if (!m_isXAxisConfigured)
+	{
+		m_xMinValue = 1;
+		m_xMaxValue = static_cast<int>(m_values.size());
 	}
 }
 

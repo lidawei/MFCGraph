@@ -23,6 +23,15 @@
 #define IDC_SPIN_MAXVAL                 1019
 #define IDC_SPIN_MINVAL                 1020
 #define IDC_SPIN_STEP                   1021
+#define IDC_EDIT_X_MAXVAL               1022
+#define IDC_EDIT_X_MINVAL               1023
+#define IDC_EDIT_X_STEP                 1024
+#define IDC_SPIN_X_MAXVAL               1025
+#define IDC_SPIN_X_MINVAL               1026
+#define IDC_SPIN_X_STEP                 1027
+#define IDC_STATIC_X_MAXVAL             1028
+#define IDC_STATIC_X_MINVAL             1029
+#define IDC_STATIC_X_STEP               1030
 
 // Next default values for new objects
 // 
@@ -30,7 +39,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1022
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

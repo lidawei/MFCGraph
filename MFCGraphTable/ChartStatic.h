@@ -17,6 +17,12 @@ public:
 	int GetYAxisMinValue() const;
 	int GetYAxisMaxValue() const;
 	int GetYAxisStep() const;
+	void SetXAxisMinValue(int value);
+	void SetXAxisMaxValue(int value);
+	void SetXAxisStep(int value);
+	int GetXAxisMinValue() const;
+	int GetXAxisMaxValue() const;
+	int GetXAxisStep() const;
 
 protected:
 	virtual void PreSubclassWindow();

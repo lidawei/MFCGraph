@@ -104,6 +104,39 @@ int CChartStatic::GetYAxisStep() const
 	return m_lineChart.GetYAxisStep();
 }
 
+void CChartStatic::SetXAxisMinValue(int value)
+{
+	m_lineChart.SetXAxisMinValue(value);
+	Invalidate(FALSE);
+}
+
+void CChartStatic::SetXAxisMaxValue(int value)
+{
+	m_lineChart.SetXAxisMaxValue(value);
+	Invalidate(FALSE);
+}
+
+void CChartStatic::SetXAxisStep(int value)
+{
+	m_lineChart.SetXAxisStep(value);
+	Invalidate(FALSE);
+}
+
+int CChartStatic::GetXAxisMinValue() const
+{
+	return m_lineChart.GetXAxisMinValue();
+}
+
+int CChartStatic::GetXAxisMaxValue() const
+{
+	return m_lineChart.GetXAxisMaxValue();
+}
+
+int CChartStatic::GetXAxisStep() const
+{
+	return m_lineChart.GetXAxisStep();
+}
+
 void CChartStatic::PreSubclassWindow()
 {
 	ModifyStyle(0, SS_NOTIFY);

@@ -23,15 +23,23 @@ public:
 	int GetYAxisMinValue() const;
 	int GetYAxisMaxValue() const;
 	int GetYAxisStep() const;
+	void SetXAxisMinValue(int value);
+	void SetXAxisMaxValue(int value);
+	void SetXAxisStep(int value);
+	int GetXAxisMinValue() const;
+	int GetXAxisMaxValue() const;
+	int GetXAxisStep() const;
 
 private:
 	static const int HitRadius = 8;
 
 	bool GetChartRects(const CRect& clientRect, CRect& outerRect, CRect& chartRect) const;
 	CPoint ValueToPoint(const CRect& chartRect, int index) const;
+	int XValueToPixel(const CRect& chartRect, int value) const;
 	int PointToValue(const CRect& chartRect, int y) const;
 	int ClampValue(int value) const;
 	void ClampDataToYAxis(std::vector<int>& values) const;
+	void UpdateDefaultXAxisRange();
 	int HitTestPoint(const CRect& chartRect, CPoint point) const;
 	COLORREF LerpColor(COLORREF from, COLORREF to, double t) const;
 	void DrawThreeColorGradient(CDC* pDC, const CRect& rect) const;
@@ -44,4 +52,8 @@ private:
 	int m_yMinValue;
 	int m_yMaxValue;
 	int m_yStep;
+	int m_xMinValue;
+	int m_xMaxValue;
+	int m_xStep;
+	bool m_isXAxisConfigured;
 };

@@ -103,8 +103,8 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	m_chartTab.InsertItem(0, _T("折线图 1"));
-	m_chartTab.InsertItem(1, _T("折线图 2"));
+	m_chartTab.InsertItem(0, _T("折线图"));
+	m_chartTab.InsertItem(1, _T("表格"));
 
 	CRect tabWindowRect;
 	m_chartTab.GetWindowRect(&tabWindowRect);
@@ -116,11 +116,19 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 	pageRect.OffsetRect(tabWindowRect.left, tabWindowRect.top);
 
 	CreateChartPanel(m_chartPanel, pageRect);
-	CreateChartPanel(m_chartPanel2, pageRect);
+	CreateTablePanel(m_tablePanel, pageRect);
 
 	m_chartPanel.SetMoveAllPointsEnabled(true);
 	m_chartPanel.SetData(std::vector<int>{42, 58, 49, 72, 63, 88, 78, 94, 86, 8, 10, 20});
-	ShowChartPanel(0);
+	m_tablePanel.SetTableData(
+		std::vector<CString>{_T("名称"), _T("一月"), _T("二月"), _T("三月")},
+		std::vector<std::vector<CString>>{
+			{_T("产品A"), _T("120"), _T("135"), _T("148")},
+			{_T("产品B"), _T("95"), _T("110"), _T("126")},
+			{_T("产品C"), _T("76"), _T("88"), _T("103")}
+		});
+	m_tablePanel.SetEditable(true);
+	ShowTabPage(0);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -134,10 +142,19 @@ void CMFCGraphTableDlg::CreateChartPanel(CChartPanel& panel, const CRect& rect)
 	}
 }
 
-void CMFCGraphTableDlg::ShowChartPanel(int index)
+void CMFCGraphTableDlg::CreateTablePanel(CTablePanel& panel, const CRect& rect)
+{
+	if (panel.Create(IDD_TABLE_PANEL, this))
+	{
+		panel.SetWindowPos(nullptr, rect.left, rect.top, rect.Width(), rect.Height(),
+			SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+}
+
+void CMFCGraphTableDlg::ShowTabPage(int index)
 {
 	m_chartPanel.ShowWindow(index == 0 ? SW_SHOW : SW_HIDE);
-	m_chartPanel2.ShowWindow(index == 1 ? SW_SHOW : SW_HIDE);
+	m_tablePanel.ShowWindow(index == 1 ? SW_SHOW : SW_HIDE);
 }
 
 void CMFCGraphTableDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -198,6 +215,6 @@ void CMFCGraphTableDlg::OnTcnSelchangeTabCharts(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	UNREFERENCED_PARAMETER(pNMHDR);
 
-	ShowChartPanel(m_chartTab.GetCurSel());
+	ShowTabPage(m_chartTab.GetCurSel());
 	*pResult = 0;
 }

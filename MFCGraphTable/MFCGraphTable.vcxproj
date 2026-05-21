@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CChartPanel.h" />
+    <ClInclude Include="CTablePanel.h" />
     <ClInclude Include="ChartStatic.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="LineChart.h" />
@@ -195,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CChartPanel.cpp" />
+    <ClCompile Include="CTablePanel.cpp" />
     <ClCompile Include="ChartStatic.cpp" />
     <ClCompile Include="LineChart.cpp" />
     <ClCompile Include="MFCGraphTable.cpp" />

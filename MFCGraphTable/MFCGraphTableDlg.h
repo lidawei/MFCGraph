@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CChartPanel.h"
+#include "CTablePanel.h"
 
 
 // CMFCGraphTableDlg 对话框
@@ -30,7 +31,8 @@ protected:
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	void CreateChartPanel(CChartPanel& panel, const CRect& rect);
-	void ShowChartPanel(int index);
+	void CreateTablePanel(CTablePanel& panel, const CRect& rect);
+	void ShowTabPage(int index);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnPaint();
@@ -40,5 +42,5 @@ protected:
 public:
 	CTabCtrl m_chartTab;
 	CChartPanel m_chartPanel;
-	CChartPanel m_chartPanel2;
+	CTablePanel m_tablePanel;
 };

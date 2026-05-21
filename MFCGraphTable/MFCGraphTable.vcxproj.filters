@@ -18,6 +18,9 @@
     <ClInclude Include="CChartPanel.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CTablePanel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="ChartStatic.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -45,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CChartPanel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CTablePanel.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ChartStatic.cpp">

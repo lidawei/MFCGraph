@@ -37,14 +37,18 @@
 #define IDC_LIST_TABLE                  1033
 #define IDC_EDIT_CELL                   1034
 #define IDC_CHECK_TABLE_EDITABLE        1035
+#define IDD_EDITABLE_TABLE_PANEL        131
+#define IDC_LIST_EDITABLE_TABLE         1036
+#define IDC_EDITABLE_TABLE_CELL_EDIT    1037
+#define IDC_EDITABLE_TABLE_CELL_SPIN    1038
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        131
+#define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1036
+#define _APS_NEXT_CONTROL_VALUE         1039
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

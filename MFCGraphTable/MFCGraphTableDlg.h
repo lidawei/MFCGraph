@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CChartPanel.h"
+#include "CEditableTablePanel.h"
 #include "CTablePanel.h"
 
 
@@ -32,6 +33,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	void CreateChartPanel(CChartPanel& panel, const CRect& rect);
 	void CreateTablePanel(CTablePanel& panel, const CRect& rect);
+	void CreateEditableTablePanel(CEditableTablePanel& panel, const CRect& rect);
 	void ShowTabPage(int index);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
@@ -43,4 +45,5 @@ public:
 	CTabCtrl m_chartTab;
 	CChartPanel m_chartPanel;
 	CTablePanel m_tablePanel;
+	CEditableTablePanel m_editableTablePanel;
 };

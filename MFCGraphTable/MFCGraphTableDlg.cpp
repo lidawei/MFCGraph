@@ -105,6 +105,7 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 	// TODO: 在此添加额外的初始化代码
 	m_chartTab.InsertItem(0, _T("折线图"));
 	m_chartTab.InsertItem(1, _T("表格"));
+	m_chartTab.InsertItem(2, _T("可编辑表格"));
 
 	CRect tabWindowRect;
 	m_chartTab.GetWindowRect(&tabWindowRect);
@@ -117,6 +118,7 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 
 	CreateChartPanel(m_chartPanel, pageRect);
 	CreateTablePanel(m_tablePanel, pageRect);
+	CreateEditableTablePanel(m_editableTablePanel, pageRect);
 
 	m_chartPanel.SetMoveAllPointsEnabled(true);
 	m_chartPanel.SetData(std::vector<int>{42, 58, 49, 72, 63, 88, 78, 94, 86, 8, 10, 20});
@@ -128,6 +130,22 @@ BOOL CMFCGraphTableDlg::OnInitDialog()
 			{_T("产品C"), _T("76"), _T("88"), _T("103")}
 		});
 	m_tablePanel.SetEditable(true);
+	m_editableTablePanel.SetTableData(
+		std::vector<CString>{_T("名称"), _T("数量"), _T("单价"), _T("备注")},
+		std::vector<std::vector<CString>>{
+			{_T("产品A"), _T("12"), _T("36"), _T("双击数量列编辑")},
+			{_T("产品B"), _T("8"), _T("42"), _T("双击数量列编辑")},
+			{_T("产品C"), _T("15"), _T("28"), _T("双击数量列编辑")}
+		});
+	m_editableTablePanel.SetEditableColumn(1);
+	m_editableTablePanel.SetCellValueChangedCallback(
+		[this](int row, int column, int oldValue, int newValue)
+		{
+			CString message;
+			message.Format(_T("单元格变化触发成功：行=%d，列=%d，旧值=%d，新值=%d"),
+				row, column, oldValue, newValue);
+			AfxMessageBox(message);
+		});
 	ShowTabPage(0);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -151,10 +169,20 @@ void CMFCGraphTableDlg::CreateTablePanel(CTablePanel& panel, const CRect& rect)
 	}
 }
 
+void CMFCGraphTableDlg::CreateEditableTablePanel(CEditableTablePanel& panel, const CRect& rect)
+{
+	if (panel.Create(IDD_EDITABLE_TABLE_PANEL, this))
+	{
+		panel.SetWindowPos(nullptr, rect.left, rect.top, rect.Width(), rect.Height(),
+			SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+}
+
 void CMFCGraphTableDlg::ShowTabPage(int index)
 {
 	m_chartPanel.ShowWindow(index == 0 ? SW_SHOW : SW_HIDE);
 	m_tablePanel.ShowWindow(index == 1 ? SW_SHOW : SW_HIDE);
+	m_editableTablePanel.ShowWindow(index == 2 ? SW_SHOW : SW_HIDE);
 }
 
 void CMFCGraphTableDlg::OnSysCommand(UINT nID, LPARAM lParam)
